@@ -1,0 +1,15 @@
+type: code
+files:
+- name: src/Main.kt
+  visible: true
+  text: |-
+    fun solution(elements: MutableList<String>, index: Int): MutableList<String> {
+        // put your code here
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/11041#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: Mon, 21 Mar 2022 20:39:12 UTC
+record: -1
