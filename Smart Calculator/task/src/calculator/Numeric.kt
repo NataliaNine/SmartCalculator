@@ -1,8 +1,10 @@
 package calculator
 
 class Numeric(rawValue: String) : Element(rawValue) {
+    constructor(rawValue: Int?) : this(rawValue.toString())
+
     override fun toString(): String {
-        return "(Number) $rawValue"
+        return "$rawValue"
     }
 
     fun numericValue(): Int {

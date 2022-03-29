@@ -7,13 +7,28 @@ class Operator(rawValue: String) : Element(rawValue) {
     private val regexAllPlus = Regex("\\++")
 
     override fun toString(): String {
-        return "(Operator) $rawValue"
+        return " $rawValue "
     }
 
-    public fun getMathFunction(): (Int, Int) -> Int {
+    fun toCleanString(): String {
+        return when (rawValue[0]) {
+            '+' -> "+"
+            '-' ->
+                if (rawValue.matches(regexAllMinus) && rawValue.length % 2 == 1)
+                    "-"
+                else
+                    "+"
+            '*' -> "*"
+            '/' -> "/"
+            '^' -> "^"
+            else -> throw Exception("Invalid Operator: $rawValue")
+        }
+    }
+
+    fun getMathFunction(): (Int, Int) -> Int {
         when (rawValue[0]) {
-            '+' -> return getActualOperator()
-            '-' -> return getActualOperator()
+            '+' -> return getActualPlusOrMinusOperator()
+            '-' -> return getActualPlusOrMinusOperator()
             '*' -> return Math::multiplyExact
             '/' -> return Math::floorDiv
             '^' -> return {x, y -> x.toDouble().pow(y.toDouble()).toInt()}
@@ -21,7 +36,7 @@ class Operator(rawValue: String) : Element(rawValue) {
         }
     }
 
-    private fun getActualOperator(): (x: Int, y: Int) -> Int {
+    private fun getActualPlusOrMinusOperator(): (x: Int, y: Int) -> Int {
         val isAllMinus = rawValue.matches(regexAllMinus)
         val isAllPlus = rawValue.matches(regexAllPlus)
 
@@ -33,4 +48,20 @@ class Operator(rawValue: String) : Element(rawValue) {
         }
     }
 
+
+
+    fun precedence(): Int {
+        val isAllMinus = rawValue.matches(regexAllMinus)
+        val isAllPlus = rawValue.matches(regexAllPlus)
+
+        // PEMDAS - () is 0, ^ is 1, * is 2, / is 3, + is 4, - is 5
+        return when {
+            rawValue == "^" -> 1
+            rawValue == "*" -> 2
+            rawValue == "/" -> 3
+            isAllPlus || (isAllMinus && rawValue.length % 2 == 0) -> 4
+            isAllMinus -> 4
+            else -> throw Exception("Unknown precedence for $rawValue")
+        }
+    }
 }

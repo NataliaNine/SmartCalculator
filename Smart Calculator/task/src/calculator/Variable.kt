@@ -8,7 +8,7 @@ class Variable(rawValue: String) : Element(rawValue) {
     }
 
     override fun toString(): String {
-        return "(Variable) $variableName"
+        return "_$variableName"
     }
 
     fun name(): String {
