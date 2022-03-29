@@ -360,12 +360,6 @@ files:
 - name: src/calculator/Parenthesis.kt
   visible: true
   learner_created: true
-- name: src/calculator/ParenOpen.kt
-  visible: true
-  learner_created: true
-- name: src/calculator/ParenClose.kt
-  visible: true
-  learner_created: true
 feedback_link: https://hyperskill.org/projects/88/stages/492/implement#comment
 status: Solved
 feedback:

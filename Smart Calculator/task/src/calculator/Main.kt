@@ -1,5 +1,7 @@
 package calculator
 
+import java.math.BigInteger
+
 val REGEX_VARIABLE = Regex("[a-zA-Z]+")
 val REGEX_ALLOWED_NUMBER = Regex("-?\\d+")
 val REGEX_OPERATORS = Regex("\\++|-+|\\*|/|\\^")
@@ -7,7 +9,7 @@ val REGEX_ALL_MINUS = Regex("-+")
 val REGEX_ALL_PLUS = Regex("\\++")
 val REGEX_WHITESPACE = Regex("\\s+")
 val REGEX_FULL_SPLITTER = Regex("((?=\\+|-|\\^|=|\\s|\\(|\\))|(?<=\\+|-|\\^|=|\\s|\\(|\\)))")
-var variables: MutableMap<String, Int> = mutableMapOf()
+var variables: MutableMap<String, BigInteger> = mutableMapOf()
 var pQueue: MutableList<Parenthesis> = mutableListOf()
 var debugMode = false
 
@@ -68,7 +70,7 @@ fun processEquation(equation: String) {
         val variable: Variable = regexParserElements[0] as Variable
         val valueEquation = regexParserElements.drop(2)
         try {
-            val value: Int = calculateValue(valueEquation)
+            val value: BigInteger = calculateValue(valueEquation)
             if (debugMode) println("\nSetting variables[${variable.variableName}] = $value")
             variables[variable.variableName] = value
         } catch (e: Exception) {
@@ -78,7 +80,7 @@ fun processEquation(equation: String) {
 
     } else {
         try {
-            val value: Int? = calculateValue(regexParserElements)
+            val value: BigInteger = calculateValue(regexParserElements)
             if (value != null) println(value)
         } catch (e: Exception) {
             println(e.message)
@@ -87,7 +89,7 @@ fun processEquation(equation: String) {
     }
 }
 
-fun calculateValue(valueEquation: List<Element>): Int {
+fun calculateValue(valueEquation: List<Element>): BigInteger {
     if (debugMode) println("calling calculateValue(\"${valueEquation.joinToString(" ")}\")")
 
     if (valueEquation.size == 1) {
@@ -121,7 +123,7 @@ fun calculateValue(valueEquation: List<Element>): Int {
 
             if (operator.precedence() == opOrder) {
                 val result =
-                    Numeric(operator.getMathFunction().invoke(nValue0, nValue2))
+                    Numeric(operator.doTheMath(nValue0, nValue2))
                 if (newFlat.isEmpty()) {
                     newFlat += result
                     lastOp = operator.toCleanString()
@@ -148,7 +150,7 @@ fun calculateValue(valueEquation: List<Element>): Int {
     throw Exception("Invalid expression")
 }
 
-fun valueOfElement(element: Element): Int {
+fun valueOfElement(element: Element): BigInteger {
     return when (element) {
         is Numeric -> element.numericValue()
         is Variable -> variableValue(element)
@@ -157,7 +159,7 @@ fun valueOfElement(element: Element): Int {
     }
 }
 
-fun variableValue(variable: Variable): Int {
+fun variableValue(variable: Variable): BigInteger {
     val name = variable.name()
     val value = variables[name]
     if (value != null) {

@@ -359,6 +359,154 @@ files:
         }
     }
   learner_created: false
+- name: src/calculator/Parenthesis.kt
+  visible: true
+  text: |-
+    package calculator
+
+    // this will hold a list of the elements
+
+    class Parenthesis (rawValue: String, val parentList: MutableList<Element>) : Element(rawValue) {
+        var elements: MutableList<Element> = mutableListOf()
+
+        override fun toString(): String {
+            return "(${elements.joinToString(" ")})"
+        }
+    }
+  learner_created: true
+- name: src/calculator/Operator.kt
+  visible: true
+  text: |-
+    package calculator
+
+    import kotlin.math.pow
+
+    class Operator(rawValue: String) : Element(rawValue) {
+        private val regexAllMinus = Regex("-+")
+        private val regexAllPlus = Regex("\\++")
+
+        override fun toString(): String {
+            return " $rawValue "
+        }
+
+        fun toCleanString(): String {
+            return when (rawValue[0]) {
+                '+' -> "+"
+                '-' ->
+                    if (rawValue.matches(regexAllMinus) && rawValue.length % 2 == 1)
+                        "-"
+                    else
+                        "+"
+                '*' -> "*"
+                '/' -> "/"
+                '^' -> "^"
+                else -> throw Exception("Invalid Operator: $rawValue")
+            }
+        }
+
+        fun getMathFunction(): (Int, Int) -> Int {
+            when (rawValue[0]) {
+                '+' -> return getActualPlusOrMinusOperator()
+                '-' -> return getActualPlusOrMinusOperator()
+                '*' -> return Math::multiplyExact
+                '/' -> return Math::floorDiv
+                '^' -> return {x, y -> x.toDouble().pow(y.toDouble()).toInt()}
+                else -> throw Exception("Invalid Operator: $rawValue")
+            }
+        }
+
+        private fun getActualPlusOrMinusOperator(): (x: Int, y: Int) -> Int {
+            val isAllMinus = rawValue.matches(regexAllMinus)
+            val isAllPlus = rawValue.matches(regexAllPlus)
+
+            return when {
+                isAllPlus -> Math::addExact
+                isAllMinus && rawValue.length % 2 == 1 -> Math::subtractExact
+                isAllMinus && rawValue.length % 2 == 0 -> Math::addExact
+                else -> throw Exception("Invalid Operator: $rawValue")
+            }
+        }
+
+
+
+        fun precedence(): Int {
+            val isAllMinus = rawValue.matches(regexAllMinus)
+            val isAllPlus = rawValue.matches(regexAllPlus)
+
+            // PEMDAS - () is 0, ^ is 1, * is 2, / is 3, + is 4, - is 5
+            return when {
+                rawValue == "^" -> 1
+                rawValue == "*" -> 2
+                rawValue == "/" -> 3
+                isAllPlus || (isAllMinus && rawValue.length % 2 == 0) -> 4
+                isAllMinus -> 4
+                else -> throw Exception("Unknown precedence for $rawValue")
+            }
+        }
+    }
+  learner_created: true
+- name: src/calculator/Variable.kt
+  visible: true
+  text: |-
+    package calculator
+
+    class Variable(rawValue: String) : Element(rawValue) {
+        val variableName: String
+
+        init {
+            variableName = rawValue
+        }
+
+        override fun toString(): String {
+            return "_$variableName"
+        }
+
+        fun name(): String {
+            return rawValue
+        }
+    }
+  learner_created: true
+- name: src/calculator/Assignment.kt
+  visible: true
+  text: |-
+    package calculator
+
+    class Assignment(rawValue: String) : Element(rawValue) {
+        override fun toString(): String {
+            return "(Assignment) $rawValue"
+        }
+    }
+  learner_created: true
+- name: src/calculator/Numeric.kt
+  visible: true
+  text: |-
+    package calculator
+
+    class Numeric(rawValue: String) : Element(rawValue) {
+        constructor(rawValue: Int?) : this(rawValue.toString())
+
+        override fun toString(): String {
+            return "$rawValue"
+        }
+
+        fun numericValue(): Int {
+            return rawValue.toInt()
+        }
+
+    }
+  learner_created: true
+- name: src/calculator/Element.kt
+  visible: true
+  text: |-
+    package calculator
+
+    abstract class Element(val rawValue: String) {
+        abstract override fun toString(): String
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/88/stages/493/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Tue, 29 Mar 2022 21:32:31 UTC
 record: -1

@@ -1,5 +1,6 @@
 package calculator
 
+import java.math.BigInteger
 import kotlin.math.pow
 
 class Operator(rawValue: String) : Element(rawValue) {
@@ -25,7 +26,22 @@ class Operator(rawValue: String) : Element(rawValue) {
         }
     }
 
-    fun getMathFunction(): (Int, Int) -> Int {
+    fun doTheMath(x: BigInteger, y: BigInteger): BigInteger {
+        return when(rawValue[0]) {
+            '+' -> x.add(y)
+            '-' -> if (rawValue.matches(regexAllMinus) && rawValue.length % 2 == 1)
+                x.subtract(y)
+            else
+                x.add(y)
+            '*' -> x.multiply(y)
+            '/' -> x.divide(y)
+            '^' -> if (y.compareTo(Int.MAX_VALUE.toBigInteger()) == -1) x.pow(y.toInt())
+                else throw Exception("Invalid exponent $x^$y")
+            else -> throw Exception("Invalid Operator: $rawValue")
+        }
+    }
+/*
+    fun getMathFunction(): (BigInteger, BigInteger) -> BigInteger {
         when (rawValue[0]) {
             '+' -> return getActualPlusOrMinusOperator()
             '-' -> return getActualPlusOrMinusOperator()
@@ -35,7 +51,7 @@ class Operator(rawValue: String) : Element(rawValue) {
             else -> throw Exception("Invalid Operator: $rawValue")
         }
     }
-
+*/
     private fun getActualPlusOrMinusOperator(): (x: Int, y: Int) -> Int {
         val isAllMinus = rawValue.matches(regexAllMinus)
         val isAllPlus = rawValue.matches(regexAllPlus)
